@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext'
 import ActiveSessionCard from '@/components/ActiveSessionCard'
 import LastEventStrip from '@/components/LastEventStrip'
+import HomeReminders from '@/components/HomeReminders'
 import QuickLogBar from '@/components/QuickLogBar'
 import { useActiveSession } from '@/hooks/useEvents'
 
@@ -26,6 +27,9 @@ export default function Home() {
 
       {/* Last feed summary */}
       <LastEventStrip />
+
+      {/* Reminders */}
+      <HomeReminders />
 
       {/* Quick log */}
       <div className="mt-4 px-4">
