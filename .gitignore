@@ -1,0 +1,28 @@
+node_modules
+dist
+.env
+.env.local
+.env.production
+.env.*.local
+*.local
+
+# Supabase
+supabase/.branches
+supabase/.temp
+supabase/functions/.env
+
+# Build
+apps/web/dist
+apps/web/.vite
+*.tsbuildinfo
+*.d.ts.map
+
+# Editor
+.DS_Store
+.vscode/
+*.swp
+*.swo
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
