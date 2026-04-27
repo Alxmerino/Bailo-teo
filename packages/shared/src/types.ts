@@ -1,6 +1,7 @@
 export type EventType = 'sleep' | 'breastfeed' | 'bottle' | 'note' | 'diaper' | 'bath' | 'pump'
 export type DiaperKind = 'poop' | 'wet' | 'both'
 export type FeedSide = 'left' | 'right' | 'both'
+export type MilkType = 'breastmilk' | 'formula' | 'combination'
 
 export interface Family {
   id: string
@@ -29,7 +30,13 @@ export interface InviteCode {
 
 export interface SleepData { notes?: string }
 export interface BreastfeedData { sides: FeedSide; notes?: string }
-export interface BottleData { oz: number; notes?: string }
+export interface BottleData {
+  milkType: MilkType
+  oz: number
+  breastmilkOz?: number
+  formulaOz?: number
+  notes?: string
+}
 export interface NoteData { text: string }
 export interface DiaperData { kind: DiaperKind; notes?: string }
 export interface BathData { notes?: string }

@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const eventTypeSchema = z.enum(['sleep', 'breastfeed', 'bottle', 'note', 'diaper', 'bath', 'pump'])
 export const diaperKindSchema = z.enum(['poop', 'wet', 'both'])
 export const feedSideSchema = z.enum(['left', 'right', 'both'])
+export const milkTypeSchema = z.enum(['breastmilk', 'formula', 'combination'])
 
 export const sleepDataSchema = z.object({})
 export const breastfeedDataSchema = z.object({
@@ -14,7 +15,10 @@ export const pumpDataSchema = z.object({
   oz: z.number().positive().optional(),
 })
 export const bottleDataSchema = z.object({
+  milkType: milkTypeSchema,
   oz: z.number().positive(),
+  breastmilkOz: z.number().min(0).optional(),
+  formulaOz: z.number().min(0).optional(),
 })
 export const noteDataSchema = z.object({
   text: z.string().min(1),

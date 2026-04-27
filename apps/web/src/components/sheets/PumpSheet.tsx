@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FlaskConical } from 'lucide-react'
+import { Droplet } from 'lucide-react'
 import { useLogEvent } from '@/hooks/useEvents'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -34,7 +34,7 @@ export default function PumpSheet({ open, onClose }: Props) {
   }
 
   return (
-    <BottomSheet open={open} onClose={onClose} title="Pump" icon={<FlaskConical className="text-purple-400" />}>
+    <BottomSheet open={open} onClose={onClose} title="Pump" icon={<Droplet className="text-purple-400" />}>
       <div className="space-y-4">
         <div>
           <label className="mb-1.5 block text-sm font-medium text-muted-foreground">Time</label>

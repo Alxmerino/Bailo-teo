@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Moon, Sun, Baby, Milk, FileText, Droplets, Bath, FlaskConical, type LucideIcon } from 'lucide-react'
+import { Moon, Sun, Baby, Milk, FileText, Droplets, Droplet, Bath, type LucideIcon } from 'lucide-react'
 import { useActiveSession, useUpdateEvent } from '@/hooks/useEvents'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { durationSince } from '@/lib/time'
+import { durationSince, formatTime } from '@/lib/time'
 import SleepSheet from './sheets/SleepSheet'
 import BreastfeedSheet from './sheets/BreastfeedSheet'
 import BottleSheet from './sheets/BottleSheet'
@@ -23,7 +23,7 @@ interface QuickButton {
 
 const BUTTONS: QuickButton[] = [
   { id: 'breastfeed', label: 'Feed', icon: Baby, color: 'text-pink-400' },
-  { id: 'pump', label: 'Pump', icon: FlaskConical, color: 'text-purple-400' },
+  { id: 'pump', label: 'Pump', icon: Droplet, color: 'text-purple-400' },
   { id: 'bottle', label: 'Bottle', icon: Milk, color: 'text-blue-400' },
   { id: 'diaper', label: 'Diaper', icon: Droplets, color: 'text-yellow-400' },
   { id: 'bath', label: 'Bath', icon: Bath, color: 'text-cyan-400' },
@@ -38,11 +38,12 @@ export default function QuickLogBar() {
 
   async function handleWakeUp() {
     if (!activeSession) return
+    const now = new Date()
     await updateEvent.mutateAsync({
       id: activeSession.id,
-      updates: { ended_at: new Date().toISOString() },
+      updates: { ended_at: now.toISOString() },
     })
-    toast.success('Sleep ended — ' + durationSince(activeSession.started_at))
+    toast.success(`Woke at ${formatTime(now)} · slept ${durationSince(activeSession.started_at)}`)
   }
 
   return (

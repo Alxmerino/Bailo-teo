@@ -3,7 +3,7 @@ import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useDeleteEvent } from '@/hooks/useEvents'
 import { formatTime, formatDuration } from '@/lib/time'
-import type { BailoteoEvent, BreastfeedData, BottleData, DiaperData, PumpData } from '@bailoteo/shared'
+import type { BailoteoEvent, BreastfeedData, BottleData, DiaperData, PumpData, MilkType } from '@bailoteo/shared'
 import { cn } from '@/lib/utils'
 
 const TYPE_ICONS: Record<string, string> = {
@@ -56,7 +56,13 @@ function EventDetail({ event }: { event: BailoteoEvent }) {
     case 'bottle': {
       const d = event.data as BottleData
       notes = d.notes
-      main = <span>{d.oz} oz</span>
+      const MILK_LABEL: Record<MilkType, string> = { breastmilk: 'BM', formula: 'F', combination: 'combo' }
+      const detail = d.milkType === 'combination' && d.breastmilkOz != null && d.formulaOz != null
+        ? `${d.oz} oz (${d.breastmilkOz} BM + ${d.formulaOz} F)`
+        : d.milkType
+          ? `${d.oz} oz · ${MILK_LABEL[d.milkType]}`
+          : `${d.oz} oz`
+      main = <span>{detail}</span>
       break
     }
     case 'diaper': {
