@@ -12,6 +12,8 @@ pnpm db:stop
 
 **Always run `pnpm build` before committing.** There is no test suite — the build is the gate.
 
+**Never commit or push without explicit user instruction.** Run the build and report success, then wait for the user to say "commit" or "push".
+
 ---
 
 ## Monorepo Layout

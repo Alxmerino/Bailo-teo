@@ -30,7 +30,13 @@ export function useEvents(limitDays = 30) {
     staleTime: 1000 * 30,
   })
 
-  // Realtime subscription
+  return query
+}
+
+export function useEventsSubscription() {
+  const { family } = useAuth()
+  const qc = useQueryClient()
+
   useEffect(() => {
     if (!family?.id) return
 
@@ -39,14 +45,15 @@ export function useEvents(limitDays = 30) {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'events', filter: `family_id=eq.${family.id}` },
-        () => { qc.invalidateQueries({ queryKey: ['events', family.id] }) }
+        () => {
+          qc.invalidateQueries({ queryKey: ['events', family.id] })
+          qc.invalidateQueries({ queryKey: ['active-session', family.id] })
+        }
       )
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
   }, [family?.id, qc])
-
-  return query
 }
 
 export function useActiveSession() {
