@@ -28,27 +28,30 @@ export default function LastEventStrip() {
     e.type === 'sleep' && e.ended_at && !e.deleted_at
   )
 
-  if (!lastFeed && !lastWake) return null
+  const showWake = !!(lastWake && !activeSession)
+  const both = !!(lastFeed && showWake)
+
+  if (!lastFeed && !showWake) return null
 
   return (
-    <div className="mx-4 mt-3 grid grid-cols-2 gap-2">
-      {lastFeed ? (
-        <div className="rounded-xl bg-secondary/60 px-3 py-3">
+    <div className={`mx-4 mt-3 gap-2 ${both ? 'grid grid-cols-2' : 'flex'}`}>
+      {lastFeed && (
+        <div className="flex-1 rounded-xl bg-secondary/60 px-3 py-3">
           <p className="text-xs text-muted-foreground">Last feed</p>
           <p className="mt-1 text-sm font-semibold">
             {lastFeed.type === 'breastfeed' ? '🤱' : '🍼'} {describeFeed(lastFeed)}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">{relativeTime(lastFeed.started_at)}</p>
         </div>
-      ) : <div />}
+      )}
 
-      {lastWake && !activeSession ? (
-        <div className="rounded-xl bg-secondary/60 px-3 py-3">
+      {showWake && (
+        <div className="flex-1 rounded-xl bg-secondary/60 px-3 py-3">
           <p className="text-xs text-muted-foreground">{babyName} woke up</p>
-          <p className="mt-1 text-sm font-semibold">☀️ {formatTime(lastWake.ended_at!)}</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">{relativeTime(lastWake.ended_at!)}</p>
+          <p className="mt-1 text-sm font-semibold">☀️ {formatTime(lastWake!.ended_at!)}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{relativeTime(lastWake!.ended_at!)}</p>
         </div>
-      ) : <div />}
+      )}
     </div>
   )
 }
