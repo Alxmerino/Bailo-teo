@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Moon, StopCircle } from 'lucide-react'
 import { useActiveSession, useUpdateEvent } from '@/hooks/useEvents'
+import { useAuth } from '@/contexts/AuthContext'
 import { durationSince, durationSinceMinutes, formatTime } from '@/lib/time'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -8,7 +9,9 @@ import { toast } from 'sonner'
 export default function ActiveSessionCard() {
   const { data: session } = useActiveSession()
   const updateEvent = useUpdateEvent()
+  const { family } = useAuth()
   const [, forceRender] = useState(0)
+  const babyName = family?.baby_name ?? 'Baby'
 
   useEffect(() => {
     if (!session) return
@@ -44,7 +47,7 @@ export default function ActiveSessionCard() {
             <Moon size={20} className={isLong ? 'text-accent' : 'text-primary'} />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Sleeping since {formatTime(session.started_at)}</p>
+            <p className="text-xs text-muted-foreground">{babyName} sleeping since {formatTime(session.started_at)}</p>
             <p className={cn(
               'text-2xl font-semibold tabular-nums',
               isLong ? 'text-accent' : 'text-primary'

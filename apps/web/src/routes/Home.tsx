@@ -14,7 +14,7 @@ export default function Home() {
       <div className="px-4 pt-6 pb-2">
         <p className="text-xs text-muted-foreground">{family?.name ?? 'Loading...'}</p>
         <h1 className="text-2xl font-bold">
-          {activeSession ? '😴 Baby is sleeping' : 'Good to see you'}
+          {activeSession ? `😴 ${family?.baby_name ?? 'Baby'} is sleeping` : 'Good to see you'}
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           {profile?.display_name ?? ''}

@@ -31,12 +31,13 @@ function exportCSV(events: ReturnType<typeof useEvents>['data']) {
 }
 
 export default function Settings() {
-  const { profile, family } = useAuth()
+  const { profile, family, refreshProfile } = useAuth()
   const { data: events = [] } = useEvents(90)
   const [activeCodes, setActiveCodes] = useState<InviteCode[]>([])
   const [generating, setGenerating] = useState(false)
   const [pushEnabled, setPushEnabled] = useState(false)
   const [reminderSettings, setReminderSettings] = useState<ReminderSettings | null>(null)
+  const [babyName, setBabyName] = useState(family?.baby_name ?? '')
 
   const loadCodes = useCallback(async () => {
     if (!family) return
@@ -93,6 +94,13 @@ export default function Settings() {
     toast.success('Link copied')
   }
 
+  async function saveBabyName() {
+    if (!family) return
+    await supabase.from('families').update({ baby_name: babyName.trim() || null }).eq('id', family.id)
+    await refreshProfile()
+    toast.success('Saved')
+  }
+
   async function togglePush() {
     if (!profile || !family) return
     if (pushEnabled) {
@@ -123,6 +131,26 @@ export default function Settings() {
         <h1 className="text-2xl font-bold">Settings</h1>
         <p className="text-sm text-muted-foreground">{family?.name}</p>
       </div>
+
+      {/* Baby name */}
+      <section className="mx-4 mb-4 rounded-2xl border border-border bg-card p-4">
+        <h2 className="font-semibold mb-3">Baby</h2>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={babyName}
+            onChange={(e) => setBabyName(e.target.value)}
+            placeholder="Baby's name (e.g. Teo)"
+            className="flex-1 rounded-xl border border-border bg-secondary px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+          <button
+            onClick={saveBabyName}
+            className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground active:scale-95 transition-transform"
+          >
+            Save
+          </button>
+        </div>
+      </section>
 
       {/* Invite codes */}
       <section className="mx-4 mb-4 rounded-2xl border border-border bg-card p-4">

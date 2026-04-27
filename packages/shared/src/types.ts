@@ -6,6 +6,7 @@ export type MilkType = 'breastmilk' | 'formula' | 'combination'
 export interface Family {
   id: string
   name: string
+  baby_name: string | null
   timezone: string
   created_at: string
 }
