@@ -38,7 +38,7 @@ function EventDetail({ event }: { event: BailoteoEvent }) {
       const dur = formatDuration(
         (new Date(event.ended_at).getTime() - new Date(event.started_at).getTime()) / 60_000
       )
-      main = <span>{dur}</span>
+      main = <span>{dur} · woke {formatTime(event.ended_at)}</span>
       break
     }
     case 'breastfeed': {
