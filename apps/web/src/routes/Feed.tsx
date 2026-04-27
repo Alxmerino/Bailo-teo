@@ -38,7 +38,7 @@ export default function Feed() {
   return (
     <div className="min-h-full bg-background">
       <div className="px-4 pt-6 pb-4">
-        <h1 className="text-2xl font-bold">Activity Feed</h1>
+        <h1 className="text-2xl font-bold">Activity Log</h1>
       </div>
 
       {isLoading && (

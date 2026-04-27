@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { LogOut, Copy, Link, Bell, BellOff, Download, Plus } from 'lucide-react'
+import { LogOut, Copy, Link, Bell, BellOff, Download, Plus, Trash2 } from 'lucide-react'
 import { formatDuration } from '@/lib/time'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
@@ -45,7 +45,6 @@ export default function Settings() {
       .from('invite_codes')
       .select('*')
       .eq('family_id', family.id)
-      .or('expires_at.is.null,expires_at.gt.' + new Date().toISOString())
       .order('created_at', { ascending: false })
     if (data) setActiveCodes(data as InviteCode[])
   }, [family?.id])
@@ -92,6 +91,12 @@ export default function Settings() {
     const url = `${window.location.origin}/join/${code}`
     navigator.clipboard.writeText(url)
     toast.success('Link copied')
+  }
+
+  async function deleteCode(code: string) {
+    await supabase.from('invite_codes').delete().eq('code', code)
+    setActiveCodes((prev) => prev.filter((ic) => ic.code !== code))
+    toast.success('Code deleted')
   }
 
   async function saveBabyName() {
@@ -150,6 +155,24 @@ export default function Settings() {
             Save
           </button>
         </div>
+        {family?.family_code && (
+          <div className="mt-4 rounded-xl bg-secondary px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground mb-0.5">Family login code</p>
+                <p className="font-mono font-bold tracking-widest text-primary text-lg">{family.family_code}</p>
+              </div>
+              <button
+                onClick={() => { navigator.clipboard.writeText(family.family_code); toast.success('Copied') }}
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-card text-muted-foreground hover:text-foreground"
+                title="Copy family code"
+              >
+                <Copy size={15} />
+              </button>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">Members use this + name + PIN to log back in</p>
+          </div>
+        )}
       </section>
 
       {/* Invite codes */}
@@ -167,35 +190,51 @@ export default function Settings() {
         </div>
 
         {activeCodes.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No active codes — generate one to invite caregivers.</p>
+          <p className="text-sm text-muted-foreground">No codes yet — generate one to invite caregivers.</p>
         ) : (
           <div className="space-y-2">
-            {activeCodes.map((ic) => (
-              <div key={ic.code} className="flex items-center gap-2 rounded-xl bg-secondary px-3 py-2.5">
-                <span className="flex-1 font-mono font-bold tracking-widest text-primary text-lg">
-                  {ic.code}
-                </span>
-                {ic.expires_at && (
-                  <span className="text-xs text-muted-foreground">
-                    exp {format(parseISO(ic.expires_at), 'h:mm a')}
-                  </span>
-                )}
-                <button
-                  onClick={() => copyCode(ic.code)}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-card text-muted-foreground hover:text-foreground"
-                  title="Copy code"
-                >
-                  <Copy size={15} />
-                </button>
-                <button
-                  onClick={() => copyLink(ic.code)}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-card text-muted-foreground hover:text-foreground"
-                  title="Copy invite link"
-                >
-                  <Link size={15} />
-                </button>
-              </div>
-            ))}
+            {activeCodes.map((ic) => {
+              const expired = !!ic.expires_at && new Date(ic.expires_at) < new Date()
+              return (
+                <div key={ic.code} className={`flex items-center gap-2 rounded-xl px-3 py-2.5 ${expired ? 'bg-secondary/40 opacity-60' : 'bg-secondary'}`}>
+                  <div className="flex-1 min-w-0">
+                    <span className={`font-mono font-bold tracking-widest text-lg ${expired ? 'text-muted-foreground' : 'text-primary'}`}>
+                      {ic.code}
+                    </span>
+                    {ic.expires_at && (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        {expired ? 'expired' : `exp ${format(parseISO(ic.expires_at), 'h:mm a')}`}
+                      </span>
+                    )}
+                  </div>
+                  {!expired && (
+                    <>
+                      <button
+                        onClick={() => copyCode(ic.code)}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-card text-muted-foreground hover:text-foreground"
+                        title="Copy code"
+                      >
+                        <Copy size={15} />
+                      </button>
+                      <button
+                        onClick={() => copyLink(ic.code)}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-card text-muted-foreground hover:text-foreground"
+                        title="Copy invite link"
+                      >
+                        <Link size={15} />
+                      </button>
+                    </>
+                  )}
+                  <button
+                    onClick={() => deleteCode(ic.code)}
+                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-card text-muted-foreground hover:text-destructive"
+                    title="Delete code"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              )
+            })}
           </div>
         )}
         <p className="mt-2 text-xs text-muted-foreground">Codes expire after 24 hours · link opens join page with code prefilled</p>

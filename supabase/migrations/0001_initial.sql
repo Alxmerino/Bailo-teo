@@ -129,8 +129,8 @@ DECLARE
 BEGIN
   v_slug := lower(regexp_replace(p_display_name, '[^a-zA-Z0-9]', '', 'g'));
 
-  INSERT INTO families (name, timezone)
-  VALUES (p_family_name, p_timezone)
+  INSERT INTO families (name, timezone, family_code)
+  VALUES (p_family_name, p_timezone, upper(substring(md5(gen_random_uuid()::text) from 1 for 6)))
   RETURNING id INTO v_family_id;
 
   INSERT INTO profiles (id, family_id, display_name, login_slug, is_parent)

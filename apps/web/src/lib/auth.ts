@@ -45,16 +45,18 @@ export async function signUpCaregiver(
   displayName: string,
   pin: string
 ) {
-  // Validate invite code + get family_id
+  // Look up invite code to get family_id (expiry validated by join_family_with_code RPC)
   const { data: codeRow, error: codeErr } = await supabase
     .from('invite_codes')
     .select('family_id')
     .eq('code', inviteCode.toUpperCase())
-    .or('expires_at.is.null,expires_at.gt.' + new Date().toISOString())
     .maybeSingle()
 
   if (codeErr) throw codeErr
-  if (!codeRow) throw new Error('Invalid or expired invite code')
+  if (!codeRow) throw new Error('Invalid invite code')
+
+  // Clear any existing session so signUp returns a clean caregiver session
+  await supabase.auth.signOut()
 
   const email = syntheticEmail(displayName, codeRow.family_id)
 
@@ -73,21 +75,19 @@ export async function signUpCaregiver(
 }
 
 export async function signInCaregiver(
-  inviteCode: string,
+  familyCode: string,
   displayName: string,
   pin: string
 ) {
-  // Look up family_id from invite code
-  const { data: codeRow, error: codeErr } = await supabase
-    .from('invite_codes')
-    .select('family_id')
-    .eq('code', inviteCode.toUpperCase())
-    .maybeSingle()
+  // Look up family_id from permanent family code (unauthenticated-safe SECURITY DEFINER fn)
+  const { data: familyId, error: fnErr } = await supabase.rpc('get_family_id_by_code', {
+    p_family_code: familyCode.toUpperCase(),
+  })
 
-  if (codeErr) throw codeErr
-  if (!codeRow) throw new Error('Invalid family code')
+  if (fnErr) throw fnErr
+  if (!familyId) throw new Error('Family code not found')
 
-  const email = syntheticEmail(displayName, codeRow.family_id)
+  const email = syntheticEmail(displayName, familyId)
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password: pinToPassword(pin) })
   if (error) {

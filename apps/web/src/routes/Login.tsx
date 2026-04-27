@@ -37,7 +37,7 @@ export default function Login() {
 
   async function onCaregiverSubmit(data: z.infer<typeof caregiverSchema>) {
     try {
-      await signInCaregiver(data.inviteCode, data.displayName, data.pin)
+      await signInCaregiver(data.inviteCode, data.displayName, data.pin) // inviteCode field holds the family code
       navigate('/')
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : 'Sign in failed')
@@ -55,11 +55,11 @@ export default function Login() {
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`flex-1 rounded-lg py-2 text-sm font-medium capitalize transition-colors ${
+              className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
                 mode === m ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
               }`}
             >
-              {m === 'parent' ? 'Parent' : 'Caregiver'}
+              {m === 'parent' ? 'Email' : 'With code'}
             </button>
           ))}
         </div>
@@ -99,7 +99,7 @@ export default function Login() {
         ) : (
           <form onSubmit={caregiverForm.handleSubmit(onCaregiverSubmit)} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium">Family invite code</label>
+              <label className="mb-1.5 block text-sm font-medium">Family code</label>
               <input
                 type="text"
                 placeholder="XXXXXX"
