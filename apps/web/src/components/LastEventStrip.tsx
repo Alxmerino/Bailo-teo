@@ -1,4 +1,4 @@
-import { useEvents } from '@/hooks/useEvents'
+import { useEvents, useActiveSession } from '@/hooks/useEvents'
 import { useAuth } from '@/contexts/AuthContext'
 import { relativeTime, formatTime } from '@/lib/time'
 import type { BailoteoEvent, BreastfeedData, BottleData } from '@bailoteo/shared'
@@ -17,6 +17,7 @@ function describeFeed(e: BailoteoEvent): string {
 export default function LastEventStrip() {
   const { family } = useAuth()
   const { data: events = [] } = useEvents(2)
+  const { data: activeSession } = useActiveSession()
   const babyName = family?.baby_name ?? 'Baby'
 
   const lastFeed = events.find((e) =>
@@ -41,7 +42,7 @@ export default function LastEventStrip() {
         </div>
       ) : <div />}
 
-      {lastWake ? (
+      {lastWake && !activeSession ? (
         <div className="rounded-xl bg-secondary/60 px-3 py-3">
           <p className="text-xs text-muted-foreground">{babyName} woke up</p>
           <p className="mt-1 text-sm font-semibold">☀️ {formatTime(lastWake.ended_at!)}</p>

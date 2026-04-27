@@ -8,6 +8,10 @@ declare const self: ServiceWorkerGlobalScope
 precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()
 
+// Activate new SW immediately instead of waiting for old clients to close
+self.addEventListener('install', () => self.skipWaiting())
+self.addEventListener('activate', (event) => event.waitUntil(clients.claim()))
+
 // API requests: network first, fall back to cache
 registerRoute(
   ({ url }) => url.pathname.startsWith('/rest/v1'),

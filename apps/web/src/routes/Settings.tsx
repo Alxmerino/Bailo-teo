@@ -8,7 +8,7 @@ import { signOut } from '@/lib/auth'
 import { subscribeToPush, unsubscribeFromPush } from '@/lib/push'
 import { supabase } from '@/lib/supabase'
 import { useEvents } from '@/hooks/useEvents'
-import type { ReminderSettings, InviteCode } from '@bailoteo/shared'
+import type { ReminderSettings, InviteCode, Profile } from '@bailoteo/shared'
 
 function exportCSV(events: ReturnType<typeof useEvents>['data']) {
   if (!events?.length) { toast.error('No events to export'); return }
@@ -33,6 +33,7 @@ function exportCSV(events: ReturnType<typeof useEvents>['data']) {
 export default function Settings() {
   const { profile, family, refreshProfile } = useAuth()
   const { data: events = [] } = useEvents(90)
+  const [members, setMembers] = useState<Profile[]>([])
   const [activeCodes, setActiveCodes] = useState<InviteCode[]>([])
   const [generating, setGenerating] = useState(false)
   const [pushEnabled, setPushEnabled] = useState(false)
@@ -53,6 +54,13 @@ export default function Settings() {
     if (!family) return
 
     loadCodes()
+
+    supabase
+      .from('profiles')
+      .select('id, display_name, is_parent, created_at, family_id, login_slug')
+      .eq('family_id', family.id)
+      .order('created_at', { ascending: true })
+      .then(({ data }) => { if (data) setMembers(data as Profile[]) })
 
     supabase
       .from('reminder_settings')
@@ -174,6 +182,32 @@ export default function Settings() {
           </div>
         )}
       </section>
+
+      {/* Members */}
+      {profile?.is_parent && members.length > 0 && (
+        <section className="mx-4 mb-4 rounded-2xl border border-border bg-card p-4">
+          <h2 className="font-semibold mb-3">Members</h2>
+          <div className="space-y-2">
+            {members.map((m) => (
+              <div key={m.id} className="flex items-center justify-between rounded-xl bg-secondary px-3 py-2.5">
+                <div>
+                  <p className="text-sm font-medium">{m.display_name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Joined {format(parseISO(m.created_at), 'MMM d, yyyy')}
+                  </p>
+                </div>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                  m.is_parent
+                    ? 'bg-primary/15 text-primary'
+                    : 'bg-secondary border border-border text-muted-foreground'
+                }`}>
+                  {m.is_parent ? 'Parent' : 'Member'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Invite codes */}
       <section className="mx-4 mb-4 rounded-2xl border border-border bg-card p-4">
