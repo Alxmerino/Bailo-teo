@@ -13,7 +13,7 @@ const TYPE_ICONS: Record<string, string> = {
   diaper: '🩲',
   bath: '🛁',
   note: '📝',
-  pump: '🧴',
+  pump: '💧',
 }
 
 const TYPE_LABELS: Record<string, string> = {
