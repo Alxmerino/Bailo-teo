@@ -27,31 +27,24 @@ export default function LastEventStrip() {
   if (!lastFeed && !lastWake) return null
 
   return (
-    <div className="mx-4 mt-3 space-y-2">
-      {lastFeed && (
-        <div className="rounded-xl bg-secondary/60 px-4 py-3">
+    <div className="mx-4 mt-3 grid grid-cols-2 gap-2">
+      {lastFeed ? (
+        <div className="rounded-xl bg-secondary/60 px-3 py-3">
           <p className="text-xs text-muted-foreground">Last feed</p>
-          <p className="mt-0.5 text-sm font-medium">
+          <p className="mt-1 text-sm font-semibold">
             {lastFeed.type === 'breastfeed' ? '🤱' : '🍼'} {describeFeed(lastFeed)}
-            <span className="text-muted-foreground font-normal">
-              {' '}· {relativeTime(lastFeed.started_at)}
-              {lastFeed.profile?.display_name ? ` by ${lastFeed.profile.display_name}` : ''}
-            </span>
           </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{relativeTime(lastFeed.started_at)}</p>
         </div>
-      )}
+      ) : <div />}
 
-      {lastWake && (
-        <div className="rounded-xl bg-secondary/60 px-4 py-3">
+      {lastWake ? (
+        <div className="rounded-xl bg-secondary/60 px-3 py-3">
           <p className="text-xs text-muted-foreground">Last woke up</p>
-          <p className="mt-0.5 text-sm font-medium">
-            ☀️ {formatTime(lastWake.ended_at!)}
-            <span className="text-muted-foreground font-normal">
-              {' '}· {relativeTime(lastWake.ended_at!)}
-            </span>
-          </p>
+          <p className="mt-1 text-sm font-semibold">☀️ {formatTime(lastWake.ended_at!)}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{relativeTime(lastWake.ended_at!)}</p>
         </div>
-      )}
+      ) : <div />}
     </div>
   )
 }
