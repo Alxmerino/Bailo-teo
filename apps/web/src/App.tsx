@@ -63,8 +63,8 @@ export default function App() {
         </BrowserRouter>
         <Toaster
           theme="dark"
-          position="top-center"
-          offset={56}
+          position="bottom-center"
+          offset={80}
           toastOptions={{ className: 'font-sans text-sm' }}
         />
       </AuthProvider>
