@@ -64,6 +64,7 @@ export default function App() {
         <Toaster
           theme="dark"
           position="top-center"
+          offset={56}
           toastOptions={{ className: 'font-sans text-sm' }}
         />
       </AuthProvider>
