@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { LogOut, Copy, Link, Bell, BellOff, Download, Plus, Trash2 } from 'lucide-react'
+import { LogOut, Copy, Link, Bell, BellOff, Download, Plus, Trash2, Clock } from 'lucide-react'
 import { formatDuration } from '@/lib/time'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
@@ -39,6 +39,7 @@ export default function Settings() {
   const [pushEnabled, setPushEnabled] = useState(false)
   const [reminderSettings, setReminderSettings] = useState<ReminderSettings | null>(null)
   const [babyName, setBabyName] = useState(family?.baby_name ?? '')
+  const [showNextEvent, setShowNextEvent] = useState(() => localStorage.getItem('bailoteo_show_next_event') === 'true')
 
   const loadCodes = useCallback(async () => {
     if (!family) return
@@ -125,6 +126,12 @@ export default function Settings() {
       if (ok) { setPushEnabled(true); toast.success('Notifications enabled') }
       else toast.error('Notification permission denied')
     }
+  }
+
+  function toggleShowNextEvent() {
+    const next = !showNextEvent
+    setShowNextEvent(next)
+    localStorage.setItem('bailoteo_show_next_event', JSON.stringify(next))
   }
 
   async function updateReminder(field: 'feed_threshold_min' | 'sleep_threshold_min', value: number) {
@@ -288,6 +295,19 @@ export default function Settings() {
           </div>
           <span className={`text-xs font-medium ${pushEnabled ? 'text-primary' : 'text-muted-foreground'}`}>
             {pushEnabled ? 'On' : 'Off'}
+          </span>
+        </button>
+
+        <button
+          onClick={toggleShowNextEvent}
+          className="flex w-full items-center justify-between rounded-xl bg-secondary px-4 py-3 mb-3"
+        >
+          <div className="flex items-center gap-2">
+            <Clock size={16} className={showNextEvent ? 'text-primary' : ''} />
+            <span className="text-sm">Show next event time</span>
+          </div>
+          <span className={`text-xs font-medium ${showNextEvent ? 'text-primary' : 'text-muted-foreground'}`}>
+            {showNextEvent ? 'On' : 'Off'}
           </span>
         </button>
 

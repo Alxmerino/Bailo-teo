@@ -1,4 +1,4 @@
-import { useEvents, useActiveSession } from '@/hooks/useEvents'
+import { useEvents, useActiveSession, useReminderSettings } from '@/hooks/useEvents'
 import { useAuth } from '@/contexts/AuthContext'
 import { relativeTime, formatTime } from '@/lib/time'
 import type { BailoteoEvent, BreastfeedData, BottleData } from '@bailoteo/shared'
@@ -18,6 +18,8 @@ export default function LastEventStrip() {
   const { family } = useAuth()
   const { data: events = [] } = useEvents(2)
   const { data: activeSession } = useActiveSession()
+  const { data: reminderSettings } = useReminderSettings()
+  const showNextEvent = localStorage.getItem('bailoteo_show_next_event') === 'true'
   const babyName = family?.baby_name ?? 'Baby'
 
   const lastFeed = events.find((e) =>
@@ -31,6 +33,14 @@ export default function LastEventStrip() {
   const showWake = !!(lastWake && !activeSession)
   const both = !!(lastFeed && showWake)
 
+  const nextFeedAt = showNextEvent && reminderSettings && lastFeed
+    ? new Date(new Date(lastFeed.started_at).getTime() + reminderSettings.feed_threshold_min * 60000)
+    : null
+
+  const nextSleepAt = showNextEvent && reminderSettings && lastWake
+    ? new Date(new Date(lastWake.ended_at!).getTime() + reminderSettings.sleep_threshold_min * 60000)
+    : null
+
   if (!lastFeed && !showWake) return null
 
   return (
@@ -42,6 +52,9 @@ export default function LastEventStrip() {
             {lastFeed.type === 'breastfeed' ? '🤱' : '🍼'} {describeFeed(lastFeed)}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">{relativeTime(lastFeed.started_at)}</p>
+          {nextFeedAt && (
+            <p className="mt-0.5 text-xs text-primary/70">Next ~{formatTime(nextFeedAt)}</p>
+          )}
         </div>
       )}
 
@@ -50,6 +63,9 @@ export default function LastEventStrip() {
           <p className="text-xs text-muted-foreground">{babyName} woke up</p>
           <p className="mt-1 text-sm font-semibold">☀️ {formatTime(lastWake!.ended_at!)}</p>
           <p className="mt-0.5 text-xs text-muted-foreground">{relativeTime(lastWake!.ended_at!)}</p>
+          {nextSleepAt && (
+            <p className="mt-0.5 text-xs text-primary/70">Next sleep ~{formatTime(nextSleepAt)}</p>
+          )}
         </div>
       )}
     </div>

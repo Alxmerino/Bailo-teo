@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { queueMutation } from '@/lib/offline-queue'
 import { useAuth } from '@/contexts/AuthContext'
-import type { BailoteoEvent, EventType, EventData } from '@bailoteo/shared'
+import type { BailoteoEvent, EventType, EventData, ReminderSettings } from '@bailoteo/shared'
 import { useEffect } from 'react'
 
 export function useEvents(limitDays = 30) {
@@ -166,5 +166,22 @@ export function useDeleteEvent() {
       qc.invalidateQueries({ queryKey: ['events', family?.id] })
       qc.invalidateQueries({ queryKey: ['active-session', family?.id] })
     },
+  })
+}
+
+export function useReminderSettings() {
+  const { family } = useAuth()
+  return useQuery({
+    queryKey: ['reminder-settings', family?.id],
+    enabled: !!family?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('reminder_settings')
+        .select('*')
+        .eq('family_id', family!.id)
+        .maybeSingle()
+      return data as ReminderSettings | null
+    },
+    staleTime: 1000 * 60 * 5,
   })
 }

@@ -10,7 +10,8 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:push": "supabase db push",
-    "db:types": "supabase gen types typescript --local > packages/shared/src/database.types.ts"
+    "db:types": "supabase gen types typescript --local > packages/shared/src/database.types.ts",
+    "deploy": "pnpm build && npx wrangler pages deploy apps/web/dist --project-name bailoteo"
   },
   "devDependencies": {
     "supabase": "^1.207.9"
